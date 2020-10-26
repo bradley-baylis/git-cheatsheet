@@ -1,0 +1,237 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Git Cheatsheet</title>
+  <meta name="description" content="Git Cheatsheet">
+  <meta name="author" content="Bradley Baylis">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class = "container">
+    <h1 class = "text-center">Git cheatsheet</h1>
+
+    <p class = >This is not a comprehensive list of Git commands, just ones that I have learnt about recently and the useful flags and 
+      applications for them.
+    </p>
+
+    <h2><code>git log</code></h2>
+    <p><code>git log</code> - show commit history</p>
+    <p><code>git log -- &lt;file&gt;</code> - show commits where <code>&lt;file&gt;</code> was modified.</p>
+    <ul class = "flag-list">
+      <li><code>-&lt;n&gt;</code> - only shows last <code>&lt;n&gt;</code> commits</li>
+      <li><code>--oneline</code> - condense each commit to a single line</li>
+      <li><code>--decorate</code> - show references for commits</li>
+      <li><code>--diff</code> - show number of insertions/deletions for each commit</li>
+      <li><code>--graph</code> - gives visual representation of branch structure</li>
+      <li><code>--grep="&lt;search-term&gt;"</code> - only shows commits with <code>&lt;search-term&gt;</code> in the message</li>
+    </ul>
+    
+    <p><code>git log -S"&lt;search-term&gt;"</code> - finds commits that added or removed <code>&lt;search-term&gt;</code> from codebase.  
+      This is called a pickaxe.
+    </p>
+
+    <h2><code>git diff</code></h2>
+    <p><code>git diff</code> - show differences between your working directory and the index.</p>
+    <p><code>git diff --staged</code> - show differences between the index and the most recent commit.</p>
+    <p><code>git diff HEAD</code> - show the differences between your working directory and the most recent commit.</p>
+    <p><code>git diff path/to/file</code> - compares changes between working directory and index for individual file</p>
+    <p><code>git diff &lt;branch1&gt;..&lt;branch2&gt;</code> - compares changes between <code>&lt;branch1&gt;</code> and 
+      <code>&lt;branch2&gt;</code>
+    </p>
+    <p><code>git diff &lt;branch1&gt; &lt;branch2&gt;</code> - compares changes between <code>&lt;branch1&gt;</code> and 
+      <code>&lt;branch2&gt;</code>
+    </p>
+    <p><code>git diff &lt;commit-hash1&gt;..&lt;commit-hash2&gt;</code> - compares changes between <code>&lt;commit-hash1&gt;</code> and 
+      <code>&lt;commit-hash2&gt;</code>
+    </p>
+    <p><code>git diff &lt;branch1&gt; &lt;branch2&gt; path/to/file</code> - compares changes between <code>&lt;branch1&gt;</code> and 
+      <code>&lt;branch2&gt;</code> for a single file
+    </p>
+
+    <h2><code>git add --patch</code></h2>
+    <p><code>git add -p</code> - opens an interactive editor that shows the diff between last commit and your current changes.  You can use
+      the interactive editor to stage "hunks", which are just individual parts of your file.</p>
+    <p><code>git add -p &lt;file&gt;</code> - same but just for <code>&lt;file&gt;</code></p>
+
+    <h2><code>git reset</code></h2>
+    <p><code>git reset &lt;commit-hash&gt;</code> - moves the HEAD and branch ref of the current branch back to <code>&lt;commit-hash&gt;
+      </code>.  If no commit is specified, it defaults to HEAD.  If <code>--soft</code>, <code>--mixed</code> or <code>--hard</code> aren't
+      specified like above, it defaults to <code>--mixed</code>.
+    </p>
+    <p><code>git reset --soft &lt;commit-hash&gt;</code> - HEAD and branch ref are moved to <code>&lt;commit-hash&gt;</code>, the staging 
+      area and working directory are unaffected.
+    </p>
+    <p><code>git reset --mixed &lt;commit-hash&gt;</code> - HEAD and branch ref are moved to <code>&lt;commit-hash&gt;</code>, the staging
+      area is reset to the <code>&lt;commit-hash&gt;</code>'s state and any undone changes are moved to the working directory.
+    </p>
+    <p><code>git reset --hard &lt;commit-hash1&gt;</code> - HEAD and branch ref are moved to <code>&lt;commit-hash&gt;</code>, the staging
+      area and working directory are reset to the <code>&lt;commit-hash&gt;</code>'s state, resulting in a loss of all changes since <code>
+      &lt;commit-hash&gt;</code>
+    </p>
+
+    <p>Example use cases:</p>
+    <ul>
+      <li>Reset the branch ref back a long way back then remake your history with clean, atomic commits</li>
+      <li>Use the default reset to clear your staging area without losing any changes so you can rebuild your commit</li>
+      <li>Abandon failed experiment with <code>git reset --hard</code></li>
+      <li>Use <code>git reset &lt;file&gt;</code> to unstage a single file</li>  
+    </ul>
+
+    <h2><code>git rebase and git cherry-pick</code></h2>
+
+    <p><code>git rebase &lt;target-branch&gt;</code> - takes all the commits on the current branch since the last common ancestor of the 
+      currently checked out branch and <code>&lt;target-branch&gt;</code> and adds them to the tip of <code>&lt;target-branch&gt;</code>.
+    </p>
+    
+    <div class = "row">
+      <div class = "col-xs-12 col-sm-4">
+        <figure class = "figure">
+          <a href = "rebase-example initial.png">
+            <img src="rebase-example initial mobile.png" class = "example-img" alt = "Rebase example initial state diagram">
+          </a>
+          <figcaption class = "figure-caption">In this example, we want to rebase commits C6 and C7, so they they are appended to 
+            <code>branch2</code>.
+          </figcaption>
+        </figure>
+      </div>
+      <div class = "col-xs-12 col-sm-4">
+        <figure class = "figure">
+          <a href = "rebase-example mid-point.png">
+            <img src="rebase-example mid-point mobile.png" class = "example-img" alt = "Rebase example mid-point state diagram">
+          </a>
+          <figcaption class = "figure-caption">We use <code>git rebase branch2</code> to achieve this.  We don't need to include <code>master
+            </code> at the end, because we already have <code>master</code> checked out.
+          </figcaption>
+        </figure>
+      </div>
+      <div class = "col-xs-12 col-sm-4">
+        <figure class = "figure">
+          <a href = "rebase-example end.png">
+            <img src="rebase-example end mobile.png" class = "example-img" alt = "Rebase example end state diagram">
+          </a>            
+          <figcaption class = "figure-caption">Finally, we use <code>git rebase master branch2</code> to move <code>branch2</code>'s pointer
+            to the same commit as <code>master</code>.
+          </figcaption>
+        </figure>
+      </div>
+    </div>
+    <p><code>git rebase -i &lt;commit-hashs&gt;</code> - gives a UI for editing the selected commits allowing you to perform operations
+      such as reorder, delete, squash, and edit the commits.
+    </p>
+    <p><code>git rebase &lt;target-branch&gt; &lt;rebase-branch&gt;</code> - has the same effect as <code>git rebase &lt;target-branch&gt;
+      </code> if the checked out branch is <code>&lt;rebase-branch&gt;</code>
+    </p>
+    <p><code>git rebase --onto &lt;commit1&gt; &lt;commit2&gt;</code> - rebase all commits after <code>&lt;commit2&gt;</code> onto <code>
+      &lt;commit1&gt;</code>
+    </p>
+    <p><code>git rebase --onto &lt;commit1&gt; &lt;commit2&gt; <code>&lt;commit3&gt;</code></code> - rebase all commits after <code
+      >&lt;commit2&gt;</code>, up to and including <code>&lt;commit3&gt;</code>, onto <code>&lt;commit1&gt;</code>
+    </p>
+    <p><code>git cherry-pick &lt;commit-hash&gt;</code> - adds <code>&lt;commit-hash&gt;</code> as a descendant of HEAD's location prior to
+       the command.
+    </p>
+
+    <h3>Example use-cases for use cherry-picking or rebasing</h3>
+    <p>Edit an old commit:</p>
+    <ul>
+      <li>Rebase method
+        <ol>
+          <li><code>git rebase -i</code> to make old commit most recent</li> 
+          <li>Make the changes and stage them</li>
+          <li><code>git commit --amend</code></li>
+          <li><code>git rebase -i</code> again to put commit back in its original location</li>
+        </ol>
+      </li>
+      <li>Cherry-pick method
+        <ol>
+          <li><code>git cherry-pick &lt;commit-to-be-edited&gt;</code></li> 
+          <li>Make the changes and stage them</li>
+          <li><code>git commit --amend</code></li>
+          <li><code>git rebase</code> or <code>git cherry-pick</code> the commits that came after</li>
+        </ol>
+      </li>
+    </ul>
+    <p>Erase debug commits:</p>
+    <ul>
+      <li>Rebase method
+        <ol>
+          <li><code>git rebase -i</code> and simply remove intermediate commits</li>
+        </ol>
+      </li>
+      <li>Cherry-pick method
+        <ol>
+          <li><code>git checkout &lt;original-branch&gt;</code></li> 
+          <li><code>git cherry-pick &lt;finished-commit&gt;</code></li>
+        </ol>
+      </li>
+    </ul>
+
+    <h2><code>git bisect</code></h2>
+    <p><code>git bisect</code> helps you run a binary search of the git history, typically to determine when a bug was introduced.  The 
+      commands below are in order:</p>
+    <p><code>git bisect start</code> - commence bisect</p>
+    <p><code>git bisect bad &lt;commit-with-bug&gt;</code> - creates start point for binary search</p>
+    <p><code>git bisect good &lt;commit-without-bug&gt;</code> - creates end point for binary search</p>
+    <p>Between <code>git bisect good</code> and <code>git bisect bad</code>, we have given <code>git bisect</code> a range of commits to 
+      search through.  At that point, we find that we have checked out a commit that is in the middle of our range.  Check for the bug and
+      if it is present, run <code>git bisect bad</code>.  Otherwise, <code>git bisect good</code>.  This will allow git to eliminate half 
+      of the commits in our original range and the ones left will become our new range. Repeat this process until you have found the bug.
+    </p>
+    <p><code>git bisect run &lt;test-script&gt; &lt;optional-args&gt;</code> - automatically completes process described above in one
+    command, running  <code>&lt;test-script&gt;</code> to check for the bug with <code>&lt;optional-args&gt;</code> if provided.</p>
+
+    <h2><code>git reflog</code></h2>
+    <p>Git keeps track of changes to local references, for example a commit, reset or merge.  These reference logs (hence reflog) can be 
+      used to undo 
+  changes</p>
+    <p><code>git reflog</code> - show ref log for HEAD ref</p>
+    <p><code>git reflog show --all</code> - show all ref logs</p>
+    <p><code>git reflog show &lt;other-branch&gt;</code> - show ref log for <code>&lt;other-branch&gt;</code></p>
+    <p>You can then reset back to otherwise unreachable commits.</p>
+    <h2><code>git tag and git describe</code></h2>
+
+    <p><code>git tag &lt;tag-name&gt; &lt;commit-hash&gt;</code> - Marks the commit with a label &lt;tag-name&gt; and makes it unchangable. 
+      If checked out, you get a detached HEAD.
+    </p>
+    <p><code>git describe</code> - gives you a sense of where your HEAD is pointing by telling you the most recent tag, how many commits 
+      since then and the hash of your HEAD commit.  E.g v1.0_2_g3jg84j
+    </p>
+
+    <h2><code>git rm and git mv</code></h2>
+
+    <p><code>git rm &lt;file&gt;</code> - removes <code>&lt;file&gt;</code> from repo and working area</p>
+    <p><code>git rm --cached &lt;file&gt;</code> - removes <code>&lt;file&gt;</code> from repo but not working area</p>
+    <p><code>git mv &lt;file1&gt; &lt;file2&gt;</code> - moves <code>&lt;file1&gt;</code> to <code>&lt;file2&gt;</code></p>
+
+    <h2>Tracking Branches</h2>
+    <p><code>git checkout -b &lt;local-branch&gt; &lt;remote-branch&gt;</code> - create and checkout <code>&lt;local-branch&gt;</code> then
+      make it track <code>&lt;remote-branch&gt;</code>
+    </p>
+    <p><code>git branch -u &lt;remote-branch&gt; &lt;local-branch&gt;</code> - set <code>&lt;local-branch&gt;</code> to track 
+      <code>&lt;remote-branch&gt;</code>, if you don't include <code>&lt;local-branch&gt;</code> it will use the one you have checked out
+    </p>
+
+
+    <h2>Pushing and pulling from remote</h2>
+
+    <p><code>git push &lt;remote&gt; &lt;branch1&gt;:&lt;branch2&gt;</code> - push <code>&lt;branch1&gt;</code> to mybranch2 on 
+     <code>&lt;remote&gt;</code>
+    </p>
+    <p><code>git push &lt;remote&gt; :&lt;my-branch&gt;</code> - delete <code>&lt;my-branch&gt;</code> on <code>&lt;remote&gt;</code></p>
+    <p>
+      <code>git push &lt;remote&gt; --delete &lt;my-branch&gt;</code> - delete <code>&lt;my-branch&gt;</code> on <code>&lt;remote&gt;</code>
+    </p>
+
+    <h2>Merge conflict resolution</h2>
+
+    <p><code>git checkout --conflict=diff3 &lt;file&gt;</code> - during merge conflict see initial state as well as the two conflict states 
+      for <code>&lt;file&gt;</code>
+    </p>
+    <p><code>git checkout --ours &lt;file&gt;</code> - during a merge conflict, discard incoming changes for <code>&lt;file&gt;</code></p>  
+    <footer class = "d-flex justify-content-center align-items-center">Bradley Baylis &copy; 2020</footer>  
+  </body>
+</html>
